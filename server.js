@@ -52,18 +52,21 @@ app.get('/usuarios', (req, res) => {
 // Ruta de login
 app.post('/login', (req, res) => {
   const { nombre_usuario, contraseña } = req.body;
+  console.log(`Intentando iniciar sesión con usuario: ${nombre_usuario} y contraseña: ${contraseña}`);
 
-  Usuario.findOne({ nombre_usuario, contraseña })
+  Usuario.findOne({ nombre_usuario: nombre_usuario, contraseña: contraseña })
     .then(usuario => {
       if (!usuario) {
+        console.log("No se encontró el usuario o la contraseña es incorrecta.");
         return res.status(404).json({ message: "Usuario no encontrado o contraseña incorrecta" });
       }
-      // Por razones de seguridad, es mejor no enviar la contraseña
-      const usuarioSinContraseña = { ...usuario._doc, contraseña: undefined };
-      res.json(usuarioSinContraseña);
     })
-    .catch(error => res.status(500).json({ message: "Error al buscar el usuario", error }));
+    .catch(error => {
+      console.error("Error al buscar el usuario:", error);
+      res.status(500).json({ message: "Error al buscar el usuario", error });
+    });
 });
+
 
 // Iniciar servidor
 app.listen(PORT, () => {
