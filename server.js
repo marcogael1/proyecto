@@ -5,36 +5,37 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 
-const MONGODB_URI = 'mongodb+srv://marco:marco@cluster0.7b1khsh.mongodb.net/cajaInteligente?retryWrites=true&w=majority&appName=Cluster0';
+// Asegúrate de reemplazar esta URI con tu conexión real a la base de datos
+const MONGODB_URI = 'tu_mongodb_uri_aquí';
 mongoose.connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log('Conectado a MongoDB Atlas'))
   .catch((error) => console.error('No se pudo conectar a MongoDB Atlas:', error));
 
-  const usuarioSchema = new mongoose.Schema({
-    nombre: String,
-    paterno: String,
-    materno: String,
-    correo: String,
-    contraseña: String,
-    telefono: String,
-    nombre_usuario: String,
-    direccion: {
-      calle: String,
-      numero_casa: String,
-      colonia: String,
-      codigo_postal: String,
-      municipio: String,
-      pais: String
-    },
-    dispositivo: [
-      {
-        mac: String,
-        modelo: String,
-        fecha_compra: Date
-      }
-    ]
-  });
-  
+const usuarioSchema = new mongoose.Schema({
+  nombre: String,
+  paterno: String,
+  materno: String,
+  correo: String,
+  contraseña: String,
+  telefono: String,
+  nombre_usuario: String,
+  direccion: {
+    calle: String,
+    numero_casa: String,
+    colonia: String,
+    codigo_postal: String,
+    municipio: String,
+    pais: String
+  },
+  dispositivo: [
+    {
+      mac: String,
+      modelo: String,
+      fecha_compra: Date
+    }
+  ]
+});
+
 const Usuario = mongoose.model('Usuario', usuarioSchema);
 
 // Rutas
@@ -48,15 +49,21 @@ app.get('/usuarios', (req, res) => {
     .catch(error => res.status(500).json({ message: "Error al obtener los usuarios", error }));
 });
 
-Usuario.findOne({ nombre_usuario: nombre_usuario, contraseña: contraseña })
-  .then(usuario => {
-    if (!usuario) {
-      return res.status(404).json({ message: "Usuario no encontrado o contraseña incorrecta" });
-    }
-    usuario.contraseña = undefined;
-    res.json(usuario);
-  })
-  .catch(error => res.status(500).json({ message: "Error al buscar el usuario", error }));
+// Ruta de login
+app.post('/login', (req, res) => {
+  const { nombre_usuario, contraseña } = req.body;
+
+  Usuario.findOne({ nombre_usuario, contraseña })
+    .then(usuario => {
+      if (!usuario) {
+        return res.status(404).json({ message: "Usuario no encontrado o contraseña incorrecta" });
+      }
+      // Por razones de seguridad, es mejor no enviar la contraseña
+      const usuarioSinContraseña = { ...usuario._doc, contraseña: undefined };
+      res.json(usuarioSinContraseña);
+    })
+    .catch(error => res.status(500).json({ message: "Error al buscar el usuario", error }));
+});
 
 // Iniciar servidor
 app.listen(PORT, () => {
