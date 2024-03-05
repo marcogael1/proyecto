@@ -6,7 +6,7 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 
 // Asegúrate de reemplazar esta URI con tu conexión real a la base de datos
-const MONGODB_URI = 'tu_mongodb_uri_aquí';
+const MONGODB_URI = 'mongodb+srv://marco:marco@cluster0.7b1khsh.mongodb.net/cajaInteligente?retryWrites=true&w=majority&appName=Cluster0';
 mongoose.connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log('Conectado a MongoDB Atlas'))
   .catch((error) => console.error('No se pudo conectar a MongoDB Atlas:', error));
