@@ -48,6 +48,16 @@ app.get('/usuarios', (req, res) => {
     .catch(error => res.status(500).json({ message: "Error al obtener los usuarios", error }));
 });
 
+Usuario.findOne({ nombre_usuario: nombre_usuario, contraseña: contraseña })
+  .then(usuario => {
+    if (!usuario) {
+      return res.status(404).json({ message: "Usuario no encontrado o contraseña incorrecta" });
+    }
+    usuario.contraseña = undefined;
+    res.json(usuario);
+  })
+  .catch(error => res.status(500).json({ message: "Error al buscar el usuario", error }));
+
 // Iniciar servidor
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en http://localhost:${PORT}`);
