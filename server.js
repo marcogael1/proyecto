@@ -65,19 +65,25 @@ app.get('/usuarios', (req, res) => {
 // Ruta de login
 app.post('/login', (req, res) => {
   const { nombre_usuario, contraseña } = req.body;
+  
   Usuario.findOne({ nombre_usuario: nombre_usuario, contraseña: contraseña })
     .then(usuario => {
       if (!usuario) {
         return res.status(404).json({ message: "Usuario no encontrado o contraseña incorrecta" });
       }
-      // Incluir el tipo de usuario en la respuesta
-      res.json({ message: "Usuario encontrado", tipo: usuario.tipo }); 
+      
+      // Usuario encontrado, devuelve también el tipo de usuario
+      res.json({
+        message: "Usuario encontrado",
+        tipo: usuario.tipo // Asegúrate de enviar el tipo de usuario en la respuesta
+      }); 
     })
     .catch(error => {
       console.error("Error al buscar el usuario:", error);
       res.status(500).json({ message: "Error al buscar el usuario", error });
     });
 });
+
 
 
 // Esquema para los datos de device_historic
