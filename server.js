@@ -88,6 +88,34 @@ app.post('/datos', (req, res) => {
     .catch(error => res.status(500).send('Error al guardar los datos en device_historic: ' + error));
 });
 
+const deviceStateSchema = new mongoose.Schema({
+  sensor: String,
+  dato: String,
+  fecha: { type: Date, default: Date.now }
+});
+
+const DeviceState = mongoose.model('device_state', deviceStateSchema);
+
+app.post('/actualizarEstado', (req, res) => {
+  const { sensor, dato } = req.body;
+
+  DeviceState.findOneAndUpdate(
+    { sensor: sensor },
+    { 
+      sensor: sensor,
+      dato: dato,
+      fecha: new Date()
+    },
+    {
+      new: true, 
+      upsert: true 
+    }
+  )
+  .then(estadoActualizado => res.status(200).json(estadoActualizado))
+  .catch(error => res.status(500).json({ message: "Error al actualizar el estado del dispositivo", error }));
+});
+
+
 // Iniciar servidor
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en http://localhost:${PORT}`);
