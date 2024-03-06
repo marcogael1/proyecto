@@ -70,13 +70,15 @@ app.post('/login', (req, res) => {
       if (!usuario) {
         return res.status(404).json({ message: "Usuario no encontrado o contraseña incorrecta" });
       }
-      res.json({ message: "Usuario encontrado" }); 
+      // Incluir el tipo de usuario en la respuesta
+      res.json({ message: "Usuario encontrado", tipo: usuario.tipo }); 
     })
     .catch(error => {
       console.error("Error al buscar el usuario:", error);
       res.status(500).json({ message: "Error al buscar el usuario", error });
     });
 });
+
 
 // Esquema para los datos de device_historic
 const datosHistoricosSchema = new mongoose.Schema({
