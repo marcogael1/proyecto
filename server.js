@@ -66,6 +66,29 @@ app.post('/login', (req, res) => {
     });
 });
 
+// Esquema para los datos de device_historic
+const datosHistoricosSchema = new mongoose.Schema({
+  id: String,
+  sensor: String,
+  dato: String,
+  fecha: { type: Date, default: Date.now }
+});
+
+// Modelo para los datos de device_historic
+const DatosHistoricos = mongoose.model('device_historic', datosHistoricosSchema);
+
+// Ruta para enviar datos a device_historic
+app.post('/datos', (req, res) => {
+  const { id, sensor, dato } = req.body;
+  const nuevosDatos = new DatosHistoricos({
+    id: id,
+    sensor: sensor,
+    dato: dato
+  });
+  nuevosDatos.save()
+    .then(() => res.status(200).send('Datos guardados correctamente en device_historic'))
+    .catch(error => res.status(500).send('Error al guardar los datos en device_historic: ' + error));
+});
 
 // Iniciar servidor
 app.listen(PORT, () => {
