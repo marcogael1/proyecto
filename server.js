@@ -68,7 +68,6 @@ app.post('/login', (req, res) => {
 
 // Esquema para los datos de device_historic
 const datosHistoricosSchema = new mongoose.Schema({
-  id: String,
   sensor: String,
   dato: String,
   fecha: { type: Date, default: Date.now }
@@ -81,7 +80,6 @@ const DatosHistoricos = mongoose.model('device_historic', datosHistoricosSchema)
 app.post('/datos', (req, res) => {
   const { id, sensor, dato } = req.body;
   const nuevosDatos = new DatosHistoricos({
-    id: id,
     sensor: sensor,
     dato: dato
   });
