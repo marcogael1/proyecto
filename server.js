@@ -78,7 +78,7 @@ const DatosHistoricos = mongoose.model('device_historic', datosHistoricosSchema)
 
 // Ruta para enviar datos a device_historic
 app.post('/datos', (req, res) => {
-  const { id, sensor, dato } = req.body;
+  const { sensor, dato } = req.body;
   const nuevosDatos = new DatosHistoricos({
     sensor: sensor,
     dato: dato
