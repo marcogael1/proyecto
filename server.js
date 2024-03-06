@@ -39,6 +39,18 @@ const usuarioSchema = new mongoose.Schema({
 
 const Usuario = mongoose.model('Usuario', usuarioSchema);
 
+let transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: 'ironsafe3@gmail.com',
+        pass: 'hujl dnfy inqk vuui'
+    }
+});
+
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 // Rutas
 app.get('/', (req, res) => {
   res.send('Servidor Express corriendo correctamente!');
@@ -115,6 +127,28 @@ app.post('/actualizarEstado', (req, res) => {
   .catch(error => res.status(500).json({ message: "Error al actualizar el estado del dispositivo", error }));
 });
 
+// Ruta para enviar correo electrónico
+app.post('/send-email', (req, res) => {
+  const { nombre, email, asunto, mensaje } = req.body;
+
+  const mailOptions = {
+      from: 'ironsafe3@gmail.com', // Remitente
+      to: 'ironsafe3@gmail.com', // Tu correo de empresa
+      subject: asunto,
+      html: `<p>Nombre: ${nombre}</p>
+      <p>Email: ${email}</p><p>Mensaje: ${mensaje}</p>`, // HTML body
+  };
+
+  transporter.sendMail(mailOptions, function(error, info){
+      if (error) {
+          console.log(error);
+          res.status(500).send('Error al enviar el correo');
+      } else {
+          console.log('Email enviado: ' + info.response);
+          res.status(200).send('Correo enviado con éxito');
+      }
+  });
+});
 
 // Iniciar servidor
 app.listen(PORT, () => {
