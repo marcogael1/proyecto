@@ -34,7 +34,8 @@ const usuarioSchema = new mongoose.Schema({
       modelo: String,
       fecha_compra: Date
     }
-  ]
+  ],
+  tipo: String
 });
 
 const Usuario = mongoose.model('Usuario', usuarioSchema);
