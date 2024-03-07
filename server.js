@@ -159,6 +159,13 @@ app.post('/send-email', (req, res) => {
   });
 });
 
+app.get('/estados-dispositivos', (req, res) => {
+  DeviceState.find({})
+    .then(estados => res.json(estados))
+    .catch(error => res.status(500).json({ message: "Error al obtener los estados de los dispositivos", error }));
+});
+
+
 // Iniciar servidor
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en http://localhost:${PORT}`);
