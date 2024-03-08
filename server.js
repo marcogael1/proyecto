@@ -32,7 +32,8 @@ const usuarioSchema = new mongoose.Schema({
     {
       mac: String,
       modelo: String,
-      fecha_compra: Date
+      fecha_compra: Date,
+      pin: String
     }
   ],
   tipo: String
@@ -108,6 +109,22 @@ app.post('/datos', (req, res) => {
     .then(() => res.status(200).send('Datos guardados correctamente en device_historic'))
     .catch(error => res.status(500).send('Error al guardar los datos en device_historic: ' + error));
 });
+
+app.post('/encontrar-pin', (req, res) => {
+  const { mac, pin } = req.body;
+  Usuario.findOne({ 'dispositivo.mac': mac, 'dispositivo.pin': pin })
+    .then(usuario => {
+      if (!usuario) {
+        return res.status(404).json({ message: "Pin no encontrado" });
+      }
+      res.json({ message: "Pin encontrado", usuario: { nombre: usuario.nombre, nombre_usuario: usuario.nombre_usuario } });
+    })
+    .catch(error => {
+      console.error("Error al buscar el pin:", error);
+      res.status(500).json({ message: "Error al buscar el pin", error });
+    });
+});
+
 
 const deviceStateSchema = new mongoose.Schema({
   sensor: String,
