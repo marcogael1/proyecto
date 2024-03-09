@@ -216,7 +216,7 @@ app.post('/solicitar-recuperacion', async (req, res) => {
     return res.status(404).send('Usuario no encontrado');
   }
 
-  codigosTemporales[correo] = codigo;
+  codigosTemporales[correo] = codigo.toString();
 
   setTimeout(() => {
     delete codigosTemporales[correo];
