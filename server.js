@@ -202,6 +202,56 @@ app.post('/registro', (req, res) => {
     .catch(error => res.status(500).json({ message: "Error al registrar el usuario", error }));
 });
 
+function generarCodigo() {
+  return Math.floor(100000 + Math.random() * 900000); 
+}
+
+app.post('/solicitar-recuperacion', async (req, res) => {
+  const { correo } = req.body;
+  const codigo = generarCodigo();
+
+  const usuarioExiste = await Usuario.findOne({ correo: correo });
+  if (!usuarioExiste) {
+    return res.status(404).send('Usuario no encontrado');
+  }
+
+  codigosTemporales[correo] = codigo;
+
+  setTimeout(() => {
+    delete codigosTemporales[correo];
+  }, 15 * 60 * 1000); 
+
+  const mailOptions = {
+      from: 'ironsafe3@gmail.com',
+      to: correo,
+      subject: 'Código de Verificación para Recuperar Contraseña',
+      html: `<p>Su código de verificación es: ${codigo}</p>`,
+  };
+
+  transporter.sendMail(mailOptions, function(error, info){
+      if (error) {
+          console.log(error);
+          return res.status(500).send('Error al enviar el correo');
+      } else {
+          console.log('Email enviado: ' + info.response);
+          return res.status(200).send('Correo enviado con éxito');
+      }
+  });
+});
+
+app.post('/verificar-codigo', (req, res) => {
+  const { correo, codigo } = req.body;
+
+  if (codigosTemporales[correo] === codigo) {
+    delete codigosTemporales[correo];
+
+    return res.status(200).send('Código verificado correctamente.');
+  } else {
+    return res.status(400).send('Código de verificación incorrecto.');
+  }
+});
+
+
 
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en http://localhost:${PORT}`);
