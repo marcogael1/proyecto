@@ -12,6 +12,7 @@ mongoose.connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true 
   .then(() => console.log('Conectado a MongoDB Atlas'))
   .catch((error) => console.error('No se pudo conectar a MongoDB Atlas:', error));
 
+let codigosTemporales = {}; 
 const usuarioSchema = new mongoose.Schema({
   nombre: String,
   paterno: String,
