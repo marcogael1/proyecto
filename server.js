@@ -251,6 +251,21 @@ app.post('/verificar-codigo', (req, res) => {
   }
 });
 
+app.post('/cambiar-contrasena', async (req, res) => {
+  const { correo, nuevaContrasena } = req.body;
+  try {
+    await Usuario.findOneAndUpdate(
+      { correo: correo },
+      { contraseña: nuevaContrasena },
+      { new: true }
+    );
+
+    res.status(200).send('Contraseña actualizada correctamente.');
+  } catch (error) {
+    console.error('Error al actualizar la contraseña:', error);
+    res.status(500).send('Error al actualizar la contraseña.');
+  }
+});
 
 
 app.listen(PORT, () => {
