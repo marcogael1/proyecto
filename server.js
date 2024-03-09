@@ -53,7 +53,6 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Rutas
 app.get('/', (req, res) => {
   res.send('Servidor Express corriendo correctamente!');
 });
@@ -64,7 +63,6 @@ app.get('/usuarios', (req, res) => {
     .catch(error => res.status(500).json({ message: "Error al obtener los usuarios", error }));
 });
 
-// Ruta de login
 app.post('/login', (req, res) => {
   const { nombre_usuario, contraseña } = req.body;
   
@@ -74,10 +72,9 @@ app.post('/login', (req, res) => {
         return res.status(404).json({ message: "Usuario no encontrado o contraseña incorrecta" });
       }
       
-      // Usuario encontrado, devuelve también el tipo de usuario
       res.json({
         message: "Usuario encontrado",
-        tipo: usuario.tipo // Asegúrate de enviar el tipo de usuario en la respuesta
+        tipo: usuario.tipo
       }); 
     })
     .catch(error => {
@@ -87,18 +84,14 @@ app.post('/login', (req, res) => {
 });
 
 
-
-// Esquema para los datos de device_historic
 const datosHistoricosSchema = new mongoose.Schema({
   sensor: String,
   dato: String,
   fecha: { type: Date, default: Date.now }
 });
 
-// Modelo para los datos de device_historic
 const DatosHistoricos = mongoose.model('device_historic', datosHistoricosSchema);
 
-// Ruta para enviar datos a device_historic
 app.post('/datos', (req, res) => {
   const { sensor, dato } = req.body;
   const nuevosDatos = new DatosHistoricos({
@@ -153,16 +146,15 @@ app.post('/actualizarEstado', (req, res) => {
   .catch(error => res.status(500).json({ message: "Error al actualizar el estado del dispositivo", error }));
 });
 
-// Ruta para enviar correo electrónico
 app.post('/send-email', (req, res) => {
   const { nombre, email, asunto, mensaje } = req.body;
 
   const mailOptions = {
-      from: 'ironsafe3@gmail.com', // Remitente
-      to: 'ironsafe3@gmail.com', // Tu correo de empresa
+      from: 'ironsafe3@gmail.com', 
+      to: 'ironsafe3@gmail.com', 
       subject: asunto,
       html: `<p>Nombre: ${nombre}</p>
-      <p>Email: ${email}</p><p>Mensaje: ${mensaje}</p>`, // HTML body
+      <p>Email: ${email}</p><p>Mensaje: ${mensaje}</p>`, 
   };
 
   transporter.sendMail(mailOptions, function(error, info){
@@ -182,8 +174,35 @@ app.get('/estados-dispositivos', (req, res) => {
     .catch(error => res.status(500).json({ message: "Error al obtener los estados de los dispositivos", error }));
 });
 
+app.post('/registro', (req, res) => {
+  const { nombre, nombre_usuario, correo, contraseña } = req.body;
 
-// Iniciar servidor
+  const nuevoUsuario = new Usuario({
+    nombre: nombre,
+    paterno: '', 
+    materno: '', 
+    correo: correo,
+    contraseña: contraseña,
+    telefono: '', 
+    nombre_usuario: nombre_usuario,
+    direccion: { 
+      calle: '',
+      numero_casa: '',
+      colonia: '',
+      codigo_postal: '',
+      municipio: '',
+      pais: ''
+    },
+    dispositivo: [], 
+    tipo: 'cliente' 
+  });
+
+  nuevoUsuario.save()
+    .then(usuario => res.status(201).json({ message: "Usuario registrado con éxito", usuarioId: usuario._id }))
+    .catch(error => res.status(500).json({ message: "Error al registrar el usuario", error }));
+});
+
+
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en http://localhost:${PORT}`);
 });
