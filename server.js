@@ -50,7 +50,7 @@ const cajaFuerteSchema = new mongoose.Schema({
   imagen: String // Aquí puedes agregar URLs más tarde
 });
 
-const CajaFuerte = mongoose.model('CajaFuerte', cajaFuerteSchema);
+const CajaFuerte = mongoose.model('productos', cajaFuerteSchema);
 
 
 let transporter = nodemailer.createTransport({
