@@ -47,7 +47,7 @@ const cajaFuerteSchema = new mongoose.Schema({
   precio: Number,
   descripcion: String,
   caracteristicas: [String],
-  imagen: String // Aquí puedes agregar URLs más tarde
+  imagen: String 
 });
 
 const CajaFuerte = mongoose.model('productos', cajaFuerteSchema);
@@ -136,6 +136,14 @@ app.get('/cajas-fuertes', (req, res) => {
     .catch(error => res.status(500).json({ message: "Error al obtener las cajas fuertes", error }));
 });
 
+app.get('/cajas-fuertes/:id', async (req, res) => {
+  try {
+    const producto = await CajaFuerte.findById(req.params.id);
+    res.json(producto);
+  } catch (error) {
+    res.status(404).send("Producto no encontrado");
+  }
+});
 
 const deviceStateSchema = new mongoose.Schema({
   sensor: String,
