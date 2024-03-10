@@ -42,8 +42,6 @@ const usuarioSchema = new mongoose.Schema({
 
 const Usuario = mongoose.model('Usuario', usuarioSchema);
 
-const mongoose = require('mongoose');
-
 const cajaFuerteSchema = new mongoose.Schema({
   nombre: String,
   precio: Number,
