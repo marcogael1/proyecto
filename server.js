@@ -42,6 +42,19 @@ const usuarioSchema = new mongoose.Schema({
 
 const Usuario = mongoose.model('Usuario', usuarioSchema);
 
+const mongoose = require('mongoose');
+
+const cajaFuerteSchema = new mongoose.Schema({
+  nombre: String,
+  precio: Number,
+  descripcion: String,
+  caracteristicas: [String],
+  imagen: String // Aquí puedes agregar URLs más tarde
+});
+
+const CajaFuerte = mongoose.model('CajaFuerte', cajaFuerteSchema);
+
+
 let transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -117,6 +130,12 @@ app.post('/encontrar-pin', (req, res) => {
       console.error("Error al buscar el pin:", error);
       res.status(500).json({ message: "Error al buscar el pin", error });
     });
+});
+
+app.get('/cajas-fuertes', (req, res) => {
+  CajaFuerte.find({})
+    .then(cajasFuertes => res.json(cajasFuertes))
+    .catch(error => res.status(500).json({ message: "Error al obtener las cajas fuertes", error }));
 });
 
 
