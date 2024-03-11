@@ -228,6 +228,22 @@ app.post('/registro', (req, res) => {
     .catch(error => res.status(500).json({ message: "Error al registrar el usuario", error }));
 });
 
+app.delete('/usuarios/:id', async (req, res) => {
+  const usuarioId = req.params.id;
+
+  try {
+    const usuarioEliminado = await Usuario.findByIdAndDelete(usuarioId);
+    if (!usuarioEliminado) {
+      return res.status(404).json({ message: "Usuario no encontrado" });
+    }
+
+    res.status(200).json({ message: "Usuario eliminado correctamente" });
+  } catch (error) {
+    console.error('Error al eliminar el usuario:', error);
+    res.status(500).json({ message: "Error al eliminar el usuario", error });
+  }
+});
+
 function generarCodigo() {
   return Math.floor(100000 + Math.random() * 900000); 
 }
