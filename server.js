@@ -220,7 +220,7 @@ app.post('/registro', (req, res) => {
       pais: ''
     },
     dispositivo: [], 
-    tipo: 'cliente' 
+    tipo: '' 
   });
 
   nuevoUsuario.save()
