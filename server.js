@@ -325,6 +325,22 @@ app.get('/datos-empresa', async (req, res) => {
   }
 });
 
+app.put('/datos-empresa/:id', async (req, res) => {
+  const { id } = req.params;
+  const { titulo, contenido } = req.body;
+
+  try {
+    const resultado = await Politica.findByIdAndUpdate(id, { titulo, contenido }, { new: true });
+    if (!resultado) {
+      return res.status(404).send('No se encontró el documento con el ID proporcionado.');
+    }
+    res.json(resultado);
+  } catch (error) {
+    console.error('Error al actualizar el documento:', error);
+    res.status(500).send('Error interno del servidor.');
+  }
+});
+
 
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en http://localhost:${PORT}`);
