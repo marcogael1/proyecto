@@ -52,6 +52,13 @@ const cajaFuerteSchema = new mongoose.Schema({
 
 const CajaFuerte = mongoose.model('productos', cajaFuerteSchema);
 
+const politicaSchema = new mongoose.Schema({
+  titulo: String,
+  contenido: String,
+});
+
+const Politica = mongoose.model('empresa', politicaSchema);
+
 
 let transporter = nodemailer.createTransport({
     service: 'gmail',
@@ -306,6 +313,15 @@ app.post('/cambiar-contrasena', async (req, res) => {
   } catch (error) {
     console.error('Error al actualizar la contraseña:', error);
     res.status(500).send('Error al actualizar la contraseña.');
+  }
+});
+
+app.get('/datos-empresa', async (req, res) => {
+  try {
+    const politicas = await Politica.find({}); 
+    res.json(politicas);
+  } catch (error) {
+    res.status(500).send(error);
   }
 });
 
