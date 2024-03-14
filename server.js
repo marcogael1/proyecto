@@ -37,7 +37,9 @@ const usuarioSchema = new mongoose.Schema({
       pin: String
     }
   ],
-  tipo: String
+  tipo: String,
+  pregunta: String,
+  respuesta: String
 });
 
 const Usuario = mongoose.model('Usuario', usuarioSchema);
@@ -338,6 +340,42 @@ app.put('/datos-empresa/:id', async (req, res) => {
   } catch (error) {
     console.error('Error al actualizar el documento:', error);
     res.status(500).send('Error interno del servidor.');
+  }
+});
+
+app.get('/obtener-pregunta-seguridad/:correo', async (req, res) => {
+  const { correo } = req.params;
+  
+  try {
+    const usuario = await Usuario.findOne({ correo: correo });
+    if (!usuario) {
+      return res.status(404).json({ message: "Usuario no encontrado." });
+    }
+    res.json({ pregunta: usuario.pregunta });
+  } catch (error) {
+    console.error('Error al obtener la pregunta de seguridad:', error);
+    res.status(500).json({ message: "Error al obtener la pregunta de seguridad." });
+  }
+});
+
+
+app.post('/verificar-respuesta-seguridad', async (req, res) => {
+  const { correo, respuesta } = req.body;
+  
+  try {
+    const usuario = await Usuario.findOne({ correo: correo });
+    if (!usuario) {
+      return res.status(404).json({ message: "Usuario no encontrado." });
+    }
+  
+    if (usuario.respuesta === respuesta) {
+      res.json({ esCorrecta: true });
+    } else {
+      res.json({ esCorrecta: false });
+    }
+  } catch (error) {
+    console.error('Error al verificar la respuesta a la pregunta de seguridad:', error);
+    res.status(500).json({ message: "Error al verificar la respuesta." });
   }
 });
 
