@@ -254,6 +254,23 @@ app.delete('/usuarios/:id', async (req, res) => {
   }
 });
 
+app.put('/usuarios/:id', async (req, res) => {
+  const { id } = req.params;
+  const datosActualizados = req.body;
+  
+  try {
+    const usuarioActualizado = await Usuario.findByIdAndUpdate(id, datosActualizados, { new: true });
+    if (!usuarioActualizado) {
+      return res.status(404).json({ message: "Usuario no encontrado" });
+    }
+    res.json(usuarioActualizado);
+  } catch (error) {
+    console.error('Error al actualizar el usuario:', error);
+    res.status(500).json({ message: "Error al actualizar el usuario", error });
+  }
+});
+
+
 function generarCodigo() {
   return Math.floor(100000 + Math.random() * 900000); 
 }
