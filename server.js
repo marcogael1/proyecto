@@ -49,6 +49,7 @@ const cajaFuerteSchema = new mongoose.Schema({
   precio: Number,
   descripcion: String,
   caracteristicas: [String],
+  material: String,
   imagen: String 
 });
 
