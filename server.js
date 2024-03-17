@@ -397,6 +397,36 @@ app.post('/verificar-respuesta-seguridad', async (req, res) => {
   }
 });
 
+app.delete('/cajas-fuertes/:id', async (req, res) => {
+  try {
+    const productoEliminado = await CajaFuerte.findByIdAndDelete(req.params.id);
+    if (!productoEliminado) {
+      return res.status(404).json({ message: "Producto no encontrado" });
+    }
+    res.status(200).json({ message: "Producto eliminado correctamente" });
+  } catch (error) {
+    console.error('Error al eliminar el producto:', error);
+    res.status(500).json({ message: "Error al eliminar el producto", error });
+  }
+});
+
+app.put('/cajas-fuertes/:id', async (req, res) => {
+  const { id } = req.params;
+  const datosActualizados = req.body;
+  
+  try {
+    const productoActualizado = await CajaFuerte.findByIdAndUpdate(id, datosActualizados, { new: true });
+    if (!productoActualizado) {
+      return res.status(404).json({ message: "Producto no encontrado" });
+    }
+    res.json(productoActualizado);
+  } catch (error) {
+    console.error('Error al actualizar el producto:', error);
+    res.status(500).json({ message: "Error al actualizar el producto", error });
+  }
+});
+
+
 
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en http://localhost:${PORT}`);
