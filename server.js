@@ -426,6 +426,26 @@ app.put('/cajas-fuertes/:id', async (req, res) => {
   }
 });
 
+// Endpoint para agregar un nuevo producto
+app.post('/cajas-fuertes', async (req, res) => {
+  try {
+    const { nombre, precio, descripcion, caracteristicas, material, imagen } = req.body;
+    const nuevoProducto = new CajaFuerte({
+      nombre,
+      precio,
+      descripcion,
+      caracteristicas, // Asegúrate de que esto sea un array como esperas
+      material,
+      imagen
+    });
+
+    await nuevoProducto.save();
+    res.status(201).json({ message: "Producto agregado con éxito", productoId: nuevoProducto._id });
+  } catch (error) {
+    console.error('Error al agregar el producto:', error);
+    res.status(500).json({ message: "Error al agregar el producto", error });
+  }
+});
 
 
 app.listen(PORT, () => {
