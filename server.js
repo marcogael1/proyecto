@@ -74,7 +74,7 @@ const faqSchema = new mongoose.Schema({
   respuesta: String
 });
 
-const FAQ = mongoose.model('FAQ', faqSchema);
+const FAQ = mongoose.model('fasqs', faqSchema);
 
 app.get('/preguntas-frecuentes', async (req, res) => {
   try {
