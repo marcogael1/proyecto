@@ -69,6 +69,24 @@ const politicaSchema = new mongoose.Schema({
 
 const Politica = mongoose.model('empresa', politicaSchema);
 
+const faqSchema = new mongoose.Schema({
+  pregunta: String,
+  respuesta: String
+});
+
+const FAQ = mongoose.model('FAQ', faqSchema);
+
+app.get('/preguntas-frecuentes', async (req, res) => {
+  try {
+    const preguntasFrecuentes = await FAQ.find({});
+    res.json(preguntasFrecuentes);
+  } catch (error) {
+    console.error('Error al obtener las preguntas frecuentes:', error);
+    res.status(500).json({ message: "Error al obtener las preguntas frecuentes" });
+  }
+});
+
+
 app.get('/macs-disponibles', async (req, res) => {
   try {
     const productos = await CajaFuerte.find({});
