@@ -50,8 +50,15 @@ const cajaFuerteSchema = new mongoose.Schema({
   descripcion: String,
   caracteristicas: [String],
   material: String,
-  imagen: String 
+  imagen: String,
+  macs: [
+    {
+      mac: String,
+      asignado: { type: Boolean, default: false }
+    }
+  ]
 });
+
 
 const CajaFuerte = mongoose.model('productos', cajaFuerteSchema);
 
@@ -61,6 +68,40 @@ const politicaSchema = new mongoose.Schema({
 });
 
 const Politica = mongoose.model('empresa', politicaSchema);
+
+app.get('/macs-disponibles', async (req, res) => {
+  try {
+    const productos = await CajaFuerte.find({});
+    const macsDisponibles = productos
+      .map(producto => producto.macs.filter(mac => !mac.asignado))
+      .flat();
+    res.json(macsDisponibles);
+  } catch (error) {
+    console.error('Error al obtener las MACs disponibles:', error);
+    res.status(500).json({ message: "Error al obtener las MACs disponibles", error });
+  }
+});
+
+app.post('/asignar-mac', async (req, res) => {
+  const { userId, mac } = req.body;
+
+  try {
+    await CajaFuerte.updateOne(
+      { "macs.mac": mac },
+      { "$set": { "macs.$.asignado": true } }
+    );
+    await Usuario.findByIdAndUpdate(
+      userId,
+      { $push: { dispositivo: { mac: mac } } },
+      { new: true }
+    );
+
+    res.status(200).json({ message: "MAC asignada correctamente" });
+  } catch (error) {
+    console.error('Error al asignar la MAC:', error);
+    res.status(500).json({ message: "Error al asignar la MAC", error });
+  }
+});
 
 
 let transporter = nodemailer.createTransport({
