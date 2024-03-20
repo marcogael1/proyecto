@@ -12,7 +12,7 @@ mongoose.connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true 
   .then(() => console.log('Conectado a MongoDB Atlas'))
   .catch((error) => console.error('No se pudo conectar a MongoDB Atlas:', error));
 
-let codigosTemporales = {}; 
+let codigosTemporales = {};
 const usuarioSchema = new mongoose.Schema({
   nombre: String,
   paterno: String,
@@ -86,6 +86,54 @@ app.get('/preguntas-frecuentes', async (req, res) => {
   }
 });
 
+app.post('/preguntas-frecuentes', async (req, res) => {
+  const { pregunta, respuesta } = req.body;
+
+  const nuevaPreguntaFrecuente = new FAQ({
+    pregunta,
+    respuesta
+  });
+
+  try {
+    await nuevaPreguntaFrecuente.save();
+    res.status(201).json({ message: "Pregunta frecuente agregada exitosamente", data: nuevaPreguntaFrecuente });
+  } catch (error) {
+    console.error('Error al agregar la pregunta frecuente:', error);
+    res.status(500).json({ message: "Error al agregar la pregunta frecuente" });
+  }
+});
+
+app.put('/preguntas-frecuentes/:id', async (req, res) => {
+  const { id } = req.params;
+  const { pregunta, respuesta } = req.body;
+
+  try {
+    const preguntaFrecuenteActualizada = await FAQ.findByIdAndUpdate(id, { pregunta, respuesta }, { new: true });
+    if (!preguntaFrecuenteActualizada) {
+      return res.status(404).json({ message: "Pregunta frecuente no encontrada" });
+    }
+    res.json({ message: "Pregunta frecuente actualizada exitosamente", data: preguntaFrecuenteActualizada });
+  } catch (error) {
+    console.error('Error al actualizar la pregunta frecuente:', error);
+    res.status(500).json({ message: "Error al actualizar la pregunta frecuente" });
+  }
+});
+
+app.delete('/preguntas-frecuentes/:id', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const preguntaFrecuenteEliminada = await FAQ.findByIdAndDelete(id);
+    if (!preguntaFrecuenteEliminada) {
+      return res.status(404).json({ message: "Pregunta frecuente no encontrada" });
+    }
+    res.status(200).json({ message: "Pregunta frecuente eliminada exitosamente" });
+  } catch (error) {
+    console.error('Error al eliminar la pregunta frecuente:', error);
+    res.status(500).json({ message: "Error al eliminar la pregunta frecuente" });
+  }
+});
+
 
 app.get('/macs-disponibles', async (req, res) => {
   try {
@@ -123,11 +171,11 @@ app.post('/asignar-mac', async (req, res) => {
 
 
 let transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-        user: 'ironsafe3@gmail.com',
-        pass: 'hujl dnfy inqk vuui'
-    }
+  service: 'gmail',
+  auth: {
+    user: 'ironsafe3@gmail.com',
+    pass: 'hujl dnfy inqk vuui'
+  }
 });
 
 app.use(cors());
@@ -146,17 +194,17 @@ app.get('/usuarios', (req, res) => {
 
 app.post('/login', (req, res) => {
   const { nombre_usuario, contraseña } = req.body;
-  
+
   Usuario.findOne({ nombre_usuario: nombre_usuario, contraseña: contraseña })
     .then(usuario => {
       if (!usuario) {
         return res.status(404).json({ message: "Usuario no encontrado o contraseña incorrecta" });
       }
-      
+
       res.json({
         message: "Usuario encontrado",
         tipo: usuario.tipo
-      }); 
+      });
     })
     .catch(error => {
       console.error("Error al buscar el usuario:", error);
@@ -227,39 +275,39 @@ app.post('/actualizarEstado', (req, res) => {
 
   DeviceState.findOneAndUpdate(
     { sensor: sensor },
-    { 
+    {
       sensor: sensor,
       dato: dato,
       fecha: new Date()
     },
     {
-      new: true, 
-      upsert: true 
+      new: true,
+      upsert: true
     }
   )
-  .then(estadoActualizado => res.status(200).json(estadoActualizado))
-  .catch(error => res.status(500).json({ message: "Error al actualizar el estado del dispositivo", error }));
+    .then(estadoActualizado => res.status(200).json(estadoActualizado))
+    .catch(error => res.status(500).json({ message: "Error al actualizar el estado del dispositivo", error }));
 });
 
 app.post('/send-email', (req, res) => {
   const { nombre, email, asunto, mensaje } = req.body;
 
   const mailOptions = {
-      from: 'ironsafe3@gmail.com', 
-      to: 'ironsafe3@gmail.com', 
-      subject: asunto,
-      html: `<p>Nombre: ${nombre}</p>
-      <p>Email: ${email}</p><p>Mensaje: ${mensaje}</p>`, 
+    from: 'ironsafe3@gmail.com',
+    to: 'ironsafe3@gmail.com',
+    subject: asunto,
+    html: `<p>Nombre: ${nombre}</p>
+      <p>Email: ${email}</p><p>Mensaje: ${mensaje}</p>`,
   };
 
-  transporter.sendMail(mailOptions, function(error, info){
-      if (error) {
-          console.log(error);
-          res.status(500).send('Error al enviar el correo');
-      } else {
-          console.log('Email enviado: ' + info.response);
-          res.status(200).send('Correo enviado con éxito');
-      }
+  transporter.sendMail(mailOptions, function (error, info) {
+    if (error) {
+      console.log(error);
+      res.status(500).send('Error al enviar el correo');
+    } else {
+      console.log('Email enviado: ' + info.response);
+      res.status(200).send('Correo enviado con éxito');
+    }
   });
 });
 
@@ -274,13 +322,13 @@ app.post('/registro', (req, res) => {
 
   const nuevoUsuario = new Usuario({
     nombre: nombre,
-    paterno: '', 
-    materno: '', 
+    paterno: '',
+    materno: '',
     correo: correo,
     contraseña: contraseña,
-    telefono: '', 
+    telefono: '',
     nombre_usuario: nombre_usuario,
-    direccion: { 
+    direccion: {
       calle: '',
       numero_casa: '',
       colonia: '',
@@ -288,8 +336,8 @@ app.post('/registro', (req, res) => {
       municipio: '',
       pais: ''
     },
-    dispositivo: [], 
-    tipo: tipo 
+    dispositivo: [],
+    tipo: tipo
   });
 
   nuevoUsuario.save()
@@ -316,7 +364,7 @@ app.delete('/usuarios/:id', async (req, res) => {
 app.put('/usuarios/:id', async (req, res) => {
   const { id } = req.params;
   const datosActualizados = req.body;
-  
+
   try {
     const usuarioActualizado = await Usuario.findByIdAndUpdate(id, datosActualizados, { new: true });
     if (!usuarioActualizado) {
@@ -331,7 +379,7 @@ app.put('/usuarios/:id', async (req, res) => {
 
 
 function generarCodigo() {
-  return Math.floor(100000 + Math.random() * 900000); 
+  return Math.floor(100000 + Math.random() * 900000);
 }
 
 app.post('/solicitar-recuperacion', async (req, res) => {
@@ -347,23 +395,23 @@ app.post('/solicitar-recuperacion', async (req, res) => {
 
   setTimeout(() => {
     delete codigosTemporales[correo];
-  }, 15 * 60 * 1000); 
+  }, 15 * 60 * 1000);
 
   const mailOptions = {
-      from: 'ironsafe3@gmail.com',
-      to: correo,
-      subject: 'Código de Verificación para Recuperar Contraseña',
-      html: `<p>Su código de verificación es: ${codigo}</p>`,
+    from: 'ironsafe3@gmail.com',
+    to: correo,
+    subject: 'Código de Verificación para Recuperar Contraseña',
+    html: `<p>Su código de verificación es: ${codigo}</p>`,
   };
 
-  transporter.sendMail(mailOptions, function(error, info){
-      if (error) {
-          console.log(error);
-          return res.status(500).send('Error al enviar el correo');
-      } else {
-          console.log('Email enviado: ' + info.response);
-          return res.status(200).send('Correo enviado con éxito');
-      }
+  transporter.sendMail(mailOptions, function (error, info) {
+    if (error) {
+      console.log(error);
+      return res.status(500).send('Error al enviar el correo');
+    } else {
+      console.log('Email enviado: ' + info.response);
+      return res.status(200).send('Correo enviado con éxito');
+    }
   });
 });
 
@@ -397,7 +445,7 @@ app.post('/cambiar-contrasena', async (req, res) => {
 
 app.get('/datos-empresa', async (req, res) => {
   try {
-    const politicas = await Politica.find({}); 
+    const politicas = await Politica.find({});
     res.json(politicas);
   } catch (error) {
     res.status(500).send(error);
@@ -422,7 +470,7 @@ app.put('/datos-empresa/:id', async (req, res) => {
 
 app.get('/obtener-pregunta-seguridad/:correo', async (req, res) => {
   const { correo } = req.params;
-  
+
   try {
     const usuario = await Usuario.findOne({ correo: correo });
     if (!usuario) {
@@ -438,13 +486,13 @@ app.get('/obtener-pregunta-seguridad/:correo', async (req, res) => {
 
 app.post('/verificar-respuesta-seguridad', async (req, res) => {
   const { correo, respuesta } = req.body;
-  
+
   try {
     const usuario = await Usuario.findOne({ correo: correo });
     if (!usuario) {
       return res.status(404).json({ message: "Usuario no encontrado." });
     }
-  
+
     if (usuario.respuesta === respuesta) {
       res.json({ esCorrecta: true });
     } else {
@@ -472,7 +520,7 @@ app.delete('/cajas-fuertes/:id', async (req, res) => {
 app.put('/cajas-fuertes/:id', async (req, res) => {
   const { id } = req.params;
   const datosActualizados = req.body;
-  
+
   try {
     const productoActualizado = await CajaFuerte.findByIdAndUpdate(id, datosActualizados, { new: true });
     if (!productoActualizado) {
