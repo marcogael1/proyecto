@@ -201,9 +201,13 @@ app.post('/login', (req, res) => {
         return res.status(404).json({ message: "Usuario no encontrado o contraseña incorrecta" });
       }
 
+      // Suponiendo que quieres enviar la MAC del primer dispositivo registrado por el usuario
+      const mac = usuario.dispositivo.length > 0 ? usuario.dispositivo[0].mac : null;
+
       res.json({
         message: "Usuario encontrado",
-        tipo: usuario.tipo
+        tipo: usuario.tipo,
+        mac: mac // Incluye la MAC en la respuesta
       });
     })
     .catch(error => {
@@ -211,6 +215,7 @@ app.post('/login', (req, res) => {
       res.status(500).json({ message: "Error al buscar el usuario", error });
     });
 });
+
 
 
 const datosHistoricosSchema = new mongoose.Schema({
