@@ -233,7 +233,8 @@ app.post('/login', (req, res) => {
       res.json({
         message: "Usuario encontrado",
         tipo: usuario.tipo,
-        mac: mac // Incluye la MAC en la respuesta
+        mac: mac,
+        correo: usuario.correo  // Incluye la MAC en la respuesta
       });
     })
     .catch(error => {
