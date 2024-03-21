@@ -89,7 +89,7 @@ app.post('/encontrar-mqtt', async (req, res) => {
         return res.status(404).json({ message: "Pin no encontrado" });
       }
       // Si el PIN es correcto, publica un mensaje para abrir la caja fuerte
-      mqttClient.publish('cajafuerte/comandos', 'abrir', { qos: 1 }, error => {
+      mqttClient.publish('cajafuerte/comandos', "abrir", { qos: 1 }, error => {
         if (error) {
           console.error('Error publicando mensaje: ', error);
         }
