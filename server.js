@@ -212,21 +212,11 @@ app.get('/', (req, res) => {
   res.send('Servidor Express corriendo correctamente!');
 });
 
-app.get('/usuarios/:correo', (req, res) => {
-  const { correo } = req.params;
-  Usuario.findOne({ correo: correo })
-    .then(usuario => {
-      if (!usuario) {
-        return res.status(404).json({ message: "Usuario no encontrado" });
-      }
-      res.json(usuario); // Omitir enviar información sensible como contraseñas
-    })
-    .catch(error => {
-      console.error('Error al buscar al usuario:', error);
-      res.status(500).json({ message: "Error al buscar al usuario", error });
-    });
+app.get('/usuarios', (req, res) => {
+  Usuario.find({})
+    .then(usuarios => res.json(usuarios))
+    .catch(error => res.status(500).json({ message: "Error al obtener los usuarios", error }));
 });
-
 
 app.post('/login', (req, res) => {
   const { nombre_usuario, contraseña } = req.body;
@@ -401,6 +391,21 @@ app.delete('/usuarios/:id', async (req, res) => {
     console.error('Error al eliminar el usuario:', error);
     res.status(500).json({ message: "Error al eliminar el usuario", error });
   }
+});
+
+app.get('/usuarios/:correo', (req, res) => {
+  const { correo } = req.params;
+  Usuario.findOne({ correo: correo })
+    .then(usuario => {
+      if (!usuario) {
+        return res.status(404).json({ message: "Usuario no encontrado" });
+      }
+      res.json(usuario); // Omitir enviar información sensible como contraseñas
+    })
+    .catch(error => {
+      console.error('Error al buscar al usuario:', error);
+      res.status(500).json({ message: "Error al buscar al usuario", error });
+    });
 });
 
 app.get('/usuarios/:id', async (req, res) => {
