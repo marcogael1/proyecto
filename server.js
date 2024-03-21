@@ -4,6 +4,7 @@ const app = express();
 const cors = require('cors');
 const PORT = process.env.PORT || 3000;
 const nodemailer = require('nodemailer');
+const mqtt = require('mqtt');
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -75,6 +76,34 @@ const faqSchema = new mongoose.Schema({
 });
 
 const FAQ = mongoose.model('FAQ', faqSchema);
+
+// Configuración del cliente MQTT
+const mqttClient = mqtt.connect('mqtt://a4bf771cdfaa4e788fc270de83b9359a.s1.eu.hivemq.cloud', {
+  port: 8883, // Asegúrate de usar el puerto correcto para tu configuración
+  username: 'marco',
+  password: 'Marcogael1'
+});
+
+app.post('/encontrar-mqtt', async (req, res) => {
+  const { mac, pin } = req.body;
+  Usuario.findOne({ 'dispositivo.mac': mac, 'dispositivo.pin': pin })
+    .then(usuario => {
+      if (!usuario) {
+        return res.status(404).json({ message: "Pin no encontrado" });
+      }
+      // Si el PIN es correcto, publica un mensaje para abrir la caja fuerte
+      mqttClient.publish('cajafuerte/comandos', 'abrir', { qos: 1 }, error => {
+        if (error) {
+          console.error('Error publicando mensaje: ', error);
+        }
+      });
+      res.json({ message: "Pin encontrado", usuario: { nombre: usuario.nombre, nombre_usuario: usuario.nombre_usuario } });
+    })
+    .catch(error => {
+      console.error("Error al buscar el pin:", error);
+      res.status(500).json({ message: "Error al buscar el pin", error });
+    });
+});
 
 app.get('/preguntas-frecuentes', async (req, res) => {
   try {
