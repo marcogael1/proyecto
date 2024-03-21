@@ -392,6 +392,22 @@ app.delete('/usuarios/:id', async (req, res) => {
   }
 });
 
+app.get('/usuarios/:id', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const usuario = await Usuario.findById(id);
+    if (!usuario) {
+      return res.status(404).json({ message: "Usuario no encontrado" });
+    }
+    res.json(usuario); // Asegúrate de omitir enviar información sensible como contraseñas
+  } catch (error) {
+    console.error('Error al obtener el usuario:', error);
+    res.status(500).json({ message: "Error al obtener el usuario" });
+  }
+});
+
+
 app.put('/usuarios/:id', async (req, res) => {
   const { id } = req.params;
   const datosActualizados = req.body;
