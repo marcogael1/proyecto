@@ -77,11 +77,8 @@ const faqSchema = new mongoose.Schema({
 
 const FAQ = mongoose.model('FAQ', faqSchema);
 
-// Configuración del cliente MQTT
-const mqttClient = mqtt.connect('mqtt://a4bf771cdfaa4e788fc270de83b9359a.s1.eu.hivemq.cloud', {
-  port: 8883, // Asegúrate de usar el puerto correcto para tu configuración
-  username: 'marco',
-  password: 'Marcogael1'
+const mqttClient = mqtt.connect('mqtt://broker.emqx.io', {
+  port: 1883
 });
 
 app.post('/encontrar-mqtt', async (req, res) => {
