@@ -350,7 +350,7 @@ app.get('/estados-dispositivos', (req, res) => {
 });
 
 app.post('/registro', (req, res) => {
-  const { nombre, nombre_usuario, correo, contraseña, tipo } = req.body;
+  const { nombre, nombre_usuario, correo, contraseña, pregunta, respuesta, tipo } = req.body;
 
   const nuevoUsuario = new Usuario({
     nombre: nombre,
@@ -369,7 +369,9 @@ app.post('/registro', (req, res) => {
       pais: ''
     },
     dispositivo: [],
-    tipo: tipo
+    tipo: tipo,
+    pregunta: pregunta,
+    respuesta: respuesta
   });
 
   nuevoUsuario.save()
