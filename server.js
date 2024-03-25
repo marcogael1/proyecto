@@ -162,18 +162,19 @@ app.delete('/preguntas-frecuentes/:id', async (req, res) => {
 });
 
 
-app.get('/macs-disponibles', async (req, res) => {
+app.get('/codigos-disponibles', async (req, res) => {
   try {
     const productos = await CajaFuerte.find({});
-    const macsDisponibles = productos
-      .map(producto => producto.macs.filter(mac => !mac.asignado))
+    const codigosDisponibles = productos
+      .map(producto => producto.macs.filter(mac => !mac.asignado).map(mac => mac.codigo)) 
       .flat();
-    res.json(macsDisponibles);
+    res.json(codigosDisponibles);
   } catch (error) {
-    console.error('Error al obtener las MACs disponibles:', error);
-    res.status(500).json({ message: "Error al obtener las MACs disponibles", error });
+    console.error('Error al obtener los códigos disponibles:', error);
+    res.status(500).json({ message: "Error al obtener los códigos disponibles", error });
   }
 });
+
 
 app.post('/asignar-mac', async (req, res) => {
   const { userId, mac } = req.body;
