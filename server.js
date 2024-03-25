@@ -33,6 +33,7 @@ const usuarioSchema = new mongoose.Schema({
   dispositivo: [
     {
       producto: String,
+      mac: String,
       modelo: String,
       fecha_compra: Date,
       pin: String
