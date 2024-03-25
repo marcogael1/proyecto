@@ -32,7 +32,7 @@ const usuarioSchema = new mongoose.Schema({
   },
   dispositivo: [
     {
-      mac: String,
+      producto: String,
       modelo: String,
       fecha_compra: Date,
       pin: String
@@ -175,27 +175,27 @@ app.get('/codigos-disponibles', async (req, res) => {
   }
 });
 
-
-app.post('/asignar-mac', async (req, res) => {
-  const { userId, mac } = req.body;
+app.post('/asignar-codigo', async (req, res) => {
+  const { userId, codigo } = req.body;
 
   try {
     await CajaFuerte.updateOne(
-      { "macs.mac": mac },
+      { "macs.codigo": codigo },
       { "$set": { "macs.$.asignado": true } }
     );
     await Usuario.findByIdAndUpdate(
       userId,
-      { $push: { dispositivo: { mac: mac } } },
+      { $push: { dispositivos: { producto: codigo } } },
       { new: true }
     );
 
-    res.status(200).json({ message: "MAC asignada correctamente" });
+    res.status(200).json({ message: "Código asignado correctamente" });
   } catch (error) {
-    console.error('Error al asignar la MAC:', error);
-    res.status(500).json({ message: "Error al asignar la MAC", error });
+    console.error('Error al asignar el código:', error);
+    res.status(500).json({ message: "Error al asignar el código", error });
   }
 });
+
 
 
 let transporter = nodemailer.createTransport({
