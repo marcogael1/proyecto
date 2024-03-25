@@ -55,7 +55,8 @@ const cajaFuerteSchema = new mongoose.Schema({
   macs: [
     {
       mac: String,
-      asignado: { type: Boolean, default: false }
+      asignado: { type: Boolean, default: false },
+      codigo: String,
     }
   ]
 });
@@ -447,6 +448,29 @@ function generarCodigo() {
   return Math.floor(100000 + Math.random() * 900000);
 }
 
+function generarMacCodigo() {
+  const letras = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const numeros = '0123456789';
+  let codigo = '';
+
+  for (let i = 0; i < 2; i++) {
+    codigo += letras.charAt(Math.floor(Math.random() * letras.length));
+  }
+
+  for (let i = 0; i < 3; i++) {
+    codigo += numeros.charAt(Math.floor(Math.random() * numeros.length));
+  }
+
+  let mac = '';
+  for (let i = 0; i < 6; i++) {
+    mac += Math.floor(Math.random() * 256).toString(16).padStart(2, '0');
+    if (i < 5) mac += ':';
+  }
+
+  return { codigo, mac };
+}
+
+
 app.post('/solicitar-recuperacion', async (req, res) => {
   const { correo } = req.body;
   const codigo = generarCodigo();
@@ -598,17 +622,21 @@ app.put('/cajas-fuertes/:id', async (req, res) => {
   }
 });
 
-// Endpoint para agregar un nuevo producto
 app.post('/cajas-fuertes', async (req, res) => {
   try {
     const { nombre, precio, descripcion, caracteristicas, material, imagen } = req.body;
+    const { codigo, mac } = generarMacCodigo(); 
+
+    const macsConReferencia = [{ mac, asignado: false, codigo: codigo }];
+
     const nuevoProducto = new CajaFuerte({
       nombre,
       precio,
       descripcion,
-      caracteristicas, // Asegúrate de que esto sea un array como esperas
+      caracteristicas, 
       material,
-      imagen
+      imagen,
+      macs: macsConReferencia 
     });
 
     await nuevoProducto.save();
@@ -618,6 +646,7 @@ app.post('/cajas-fuertes', async (req, res) => {
     res.status(500).json({ message: "Error al agregar el producto", error });
   }
 });
+
 
 
 app.listen(PORT, () => {
