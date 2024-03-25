@@ -8,6 +8,7 @@ const mqtt = require('mqtt');
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+const crypto = require('crypto'); // Importa el módulo crypto
 const MONGODB_URI = 'mongodb+srv://marco:marco@cluster0.7b1khsh.mongodb.net/cajaInteligente?retryWrites=true&w=majority&appName=Cluster0';
 mongoose.connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log('Conectado a MongoDB Atlas'))
@@ -228,7 +229,9 @@ app.get('/usuarios', (req, res) => {
 app.post('/login', (req, res) => {
   const { nombre_usuario, contraseña } = req.body;
 
-  Usuario.findOne({ nombre_usuario: nombre_usuario, contraseña: contraseña })
+  const contraseñaMD5 = crypto.createHash('md5').update(contraseña).digest('hex');
+
+  Usuario.findOne({ nombre_usuario: nombre_usuario, contraseña: contraseñaMD5 })
     .then(usuario => {
       if (!usuario) {
         return res.status(404).json({ message: "Usuario no encontrado o contraseña incorrecta" });
@@ -358,13 +361,13 @@ app.get('/estados-dispositivos', (req, res) => {
 
 app.post('/registro', (req, res) => {
   const { nombre, nombre_usuario, correo, contraseña, pregunta, respuesta, tipo } = req.body;
-
+  const contraseñaMD5 = crypto.createHash('md5').update(contraseña).digest('hex');
   const nuevoUsuario = new Usuario({
     nombre: nombre,
     paterno: '',
     materno: '',
     correo: correo,
-    contraseña: contraseña,
+    contraseña: contraseñaMD5,
     telefono: '',
     nombre_usuario: nombre_usuario,
     direccion: {
@@ -524,10 +527,13 @@ app.post('/verificar-codigo', (req, res) => {
 
 app.post('/cambiar-contrasena', async (req, res) => {
   const { correo, nuevaContrasena } = req.body;
+  
   try {
+
+    const nuevaContrasenaMD5 = crypto.createHash('md5').update(nuevaContrasena).digest('hex');
     await Usuario.findOneAndUpdate(
       { correo: correo },
-      { contraseña: nuevaContrasena },
+      { contraseña: nuevaContrasenaMD5 },
       { new: true }
     );
 
