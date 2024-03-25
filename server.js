@@ -185,7 +185,7 @@ app.post('/asignar-codigo', async (req, res) => {
     );
     await Usuario.findByIdAndUpdate(
       userId,
-      { $push: { dispositivos: { producto: codigo } } },
+      { $push: { dispositivo: { producto: codigo } } },
       { new: true }
     );
 
