@@ -179,13 +179,16 @@ app.post('/asignar-codigo', async (req, res) => {
   const { userId, codigo } = req.body;
 
   try {
-    await CajaFuerte.updateOne(
-      { "macs.codigo": codigo },
-      { "$set": { "macs.$.asignado": true } }
-    );
+    const producto = await CajaFuerte.findOne({ "macs.codigo": codigo });
+    if (!producto) {
+      return res.status(404).json({ message: "Producto no encontrado con ese código" });
+    }
+    const macEncontrada = producto.macs.find(mac => mac.codigo === codigo);
+    macEncontrada.asignado = true;
+    await producto.save();
     await Usuario.findByIdAndUpdate(
       userId,
-      { $push: { dispositivo: { producto: codigo } } },
+      { $push: { dispositivo: { producto: codigo, mac: macEncontrada.mac } } },
       { new: true }
     );
 
@@ -195,6 +198,7 @@ app.post('/asignar-codigo', async (req, res) => {
     res.status(500).json({ message: "Error al asignar el código", error });
   }
 });
+
 
 
 
