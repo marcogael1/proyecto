@@ -89,7 +89,7 @@ app.post('/encontrar-pin', (req, res) => {
   Usuario.findOne({ 'dispositivo.mac': mac, 'dispositivo.pin': pin })
     .then(usuario => {
       if (!usuario) {
-        return res.status(404).json({ message: "Pin no encontrado" });
+        return res.status(200).json({ message: "No se encontró un PIN registrado" });
       }
       res.json({ message: "Pin encontrado", usuario: { nombre: usuario.nombre, nombre_usuario: usuario.nombre_usuario } });
     })
@@ -98,6 +98,7 @@ app.post('/encontrar-pin', (req, res) => {
       res.status(500).json({ message: "Error al buscar el pin", error });
     });
 });
+
 
 
 
