@@ -86,10 +86,10 @@ const mqttClient = mqtt.connect('mqtt://broker.emqx.io', {
 
 app.post('/encontrar-registroPin', (req, res) => {
   const { mac } = req.body; // Solo se recibe la mac desde el cuerpo de la solicitud
-
-  // Buscar un usuario con la mac proporcionada
+  console.log("Mac recibida:", mac);
   Usuario.findOne({ 'dispositivo.mac': mac })
     .then(usuario => {
+      console.log("Usuario encontrado:", usuario);
       if (!usuario) {
         return res.status(404).json({ message: "No se encontró un PIN registrado para la mac proporcionada" });
       }
