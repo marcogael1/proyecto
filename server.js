@@ -84,7 +84,7 @@ const mqttClient = mqtt.connect('mqtt://broker.emqx.io', {
   port: 1883
 });
 
-app.post('/encontrar-pin', (req, res) => {
+app.post('/encontrar-registroPin', (req, res) => {
   const { mac } = req.body; // Solo se recibe la mac desde el cuerpo de la solicitud
 
   // Buscar un usuario con la mac proporcionada
