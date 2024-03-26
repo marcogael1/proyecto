@@ -98,7 +98,7 @@ app.post('/encontrar-pin', (req, res) => {
       if (!pinRegistrado) {
         return res.status(200).json({ message: "No se encontró un PIN registrado para la mac proporcionada" });
       }
-      res.json({ message: "Pin encontrado", usuario: { nombre: usuario.nombre, nombre_usuario: usuario.nombre_usuario } });
+      res.json({ message: "Pin encontrado"});
     })
     .catch(error => {
       console.error("Error al buscar el pin:", error);
