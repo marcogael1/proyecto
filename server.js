@@ -100,6 +100,7 @@ app.post('/encontrar-pin', (req, res) => {
 });
 
 
+
 app.post('/encontrar-mqtt', async (req, res) => {
   const { mac, pin } = req.body;
   Usuario.findOne({ 'dispositivo.mac': mac, 'dispositivo.pin': pin })
