@@ -85,11 +85,18 @@ const mqttClient = mqtt.connect('mqtt://broker.emqx.io', {
 });
 
 app.post('/encontrar-pin', (req, res) => {
-  const { mac, pin } = req.body;
-  Usuario.findOne({ 'dispositivo.mac': mac, 'dispositivo.pin': pin })
+  const { mac } = req.body; // Solo se recibe la mac desde el cuerpo de la solicitud
+
+  // Buscar un usuario con la mac proporcionada
+  Usuario.findOne({ 'dispositivo.mac': mac })
     .then(usuario => {
       if (!usuario) {
-        return res.status(200).json({ message: "No se encontró un PIN registrado" });
+        return res.status(200).json({ message: "No se encontró un PIN registrado para la mac proporcionada" });
+      }
+      const pinRegistrado = usuario.dispositivo && usuario.dispositivo.pin;
+
+      if (!pinRegistrado) {
+        return res.status(200).json({ message: "No se encontró un PIN registrado para la mac proporcionada" });
       }
       res.json({ message: "Pin encontrado", usuario: { nombre: usuario.nombre, nombre_usuario: usuario.nombre_usuario } });
     })
@@ -98,6 +105,7 @@ app.post('/encontrar-pin', (req, res) => {
       res.status(500).json({ message: "Error al buscar el pin", error });
     });
 });
+
 
 
 
