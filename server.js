@@ -91,12 +91,12 @@ app.post('/encontrar-registroPin', (req, res) => {
   Usuario.findOne({ 'dispositivo.mac': mac })
     .then(usuario => {
       if (!usuario) {
-        return res.status(200).json({ message: "No se encontró un PIN registrado para la mac proporcionada" });
+        return res.status(404).json({ message: "No se encontró un PIN registrado para la mac proporcionada" });
       }
       const pinRegistrado = usuario.dispositivo && usuario.dispositivo.pin;
 
       if (!pinRegistrado) {
-        return res.status(200).json({ message: "No se encontró un PIN registrado para la mac proporcionada" });
+        return res.status(404).json({ message: "No se encontró un PIN registrado para la mac proporcionada" });
       }
       res.json({ message: "Pin encontrado"});
     })
