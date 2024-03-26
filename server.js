@@ -84,6 +84,22 @@ const mqttClient = mqtt.connect('mqtt://broker.emqx.io', {
   port: 1883
 });
 
+app.post('/encontrar-pin', (req, res) => {
+  const { mac, pin } = req.body;
+  Usuario.findOne({ 'dispositivo.mac': mac, 'dispositivo.pin': pin })
+    .then(usuario => {
+      if (!usuario) {
+        return res.status(404).json({ message: "Pin no encontrado" });
+      }
+      res.json({ message: "Pin encontrado", usuario: { nombre: usuario.nombre, nombre_usuario: usuario.nombre_usuario } });
+    })
+    .catch(error => {
+      console.error("Error al buscar el pin:", error);
+      res.status(500).json({ message: "Error al buscar el pin", error });
+    });
+});
+
+
 app.post('/encontrar-mqtt', async (req, res) => {
   const { mac, pin } = req.body;
   Usuario.findOne({ 'dispositivo.mac': mac, 'dispositivo.pin': pin })
