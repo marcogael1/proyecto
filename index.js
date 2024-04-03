@@ -105,11 +105,14 @@ app.post('/asignar-producto', async (req, res) => {
   const { userId, codigo } = req.body;
 
   try {
-    const producto = await CajaFuerte.findOne({ "macs.codigo": codigo });
+    const producto = await CajaFuerte.findOne({ macs: { $elemMatch: { codigo: codigo } } });
+
     if (!producto) {
       return res.status(404).json({ message: "Producto no encontrado con ese código" });
     }
+
     const macEncontrada = producto.macs.find(mac => mac.codigo === codigo);
+
     if (macEncontrada.asignado) {
       return res.status(400).json({ message: "El producto ya está asignado a otro usuario" });
     }
@@ -121,12 +124,14 @@ app.post('/asignar-producto', async (req, res) => {
       { $push: { dispositivo: { producto: codigo, mac: macEncontrada.mac } } },
       { new: true }
     );
+
     res.status(200).json({ message: "Producto asignado correctamente" });
   } catch (error) {
     console.error('Error al asignar el producto:', error);
     res.status(500).json({ message: "Error al asignar el producto", error });
   }
 });
+
 
 
 app.post('/encontrar-mqtt', async (req, res) => {
