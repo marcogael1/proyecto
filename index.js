@@ -287,6 +287,7 @@ app.post('/login', (req, res) => {
 
       res.json({
         message: "Usuario encontrado",
+        id: usuario._id,
         tipo: usuario.tipo,
         mac: mac,
         correo: usuario.correo  // Incluye la MAC en la respuesta
