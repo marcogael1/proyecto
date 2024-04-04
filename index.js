@@ -105,7 +105,7 @@ app.post('/asignar-producto', async (req, res) => {
   const { userId, codigo } = req.body;
 
   try {
-    const producto = await CajaFuerte.findOne({ macs: { $elemMatch: { codigo: codigo } } });
+    const producto = await CajaFuerte.findOne({ "macs.codigo": codigo });
 
     if (!producto) {
       return res.status(404).json({ message: "Producto no encontrado con ese código" });
@@ -131,6 +131,7 @@ app.post('/asignar-producto', async (req, res) => {
     res.status(500).json({ message: "Error al asignar el producto", error });
   }
 });
+
 
 
 
