@@ -108,7 +108,7 @@ app.post('/asignar-producto', async (req, res) => {
     const producto = await CajaFuerte.findOne({ "macs.codigo": codigo });
 
     if (!producto) {
-      return res.status(404).json({ message: "Producto no encontrado con ese código: " + codigo });
+      return res.status(404).json({ message: "Producto no encontrado con ese código: " + codigo + "usuario: "+userId});
     }    
 
     const macEncontrada = producto.macs.find(mac => mac.codigo === codigo);
