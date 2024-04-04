@@ -103,7 +103,7 @@ app.post('/registro-pin', (req, res) => {
 
 app.post('/asignar-producto', async (req, res) => {
   const { userId, codigo } = req.body;
-
+  console.log(codigo);
   try {
     const producto = await CajaFuerte.findOne({ "macs.codigo": codigo });
 
