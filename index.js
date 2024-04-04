@@ -116,7 +116,7 @@ app.post('/asignar-producto', async (req, res) => {
     if (macEncontrada.asignado) {
       return res.status(400).json({ message: "El producto ya está asignado a otro usuario" });
     }
-
+    
     macEncontrada.asignado = true;
     await producto.save();
     await Usuario.findByIdAndUpdate(
@@ -124,8 +124,8 @@ app.post('/asignar-producto', async (req, res) => {
       { $push: { dispositivo: { producto: codigo, mac: macEncontrada.mac } } },
       { new: true }
     );
-
-    res.status(200).json({ message: "Producto asignado correctamente" });
+    
+    return res.status(200).json({ success: true, message: "Producto asignado correctamente" });    
   } catch (error) {
     console.error('Error al asignar el producto:', error);
     res.status(500).json({ message: "Error al asignar el producto", error });
