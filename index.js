@@ -310,16 +310,18 @@ app.post('/login', (req, res) => {
 const datosHistoricosSchema = new mongoose.Schema({
   sensor: String,
   dato: String,
+  producto: String,
   fecha: { type: Date, default: Date.now }
 });
 
 const DatosHistoricos = mongoose.model('device_historic', datosHistoricosSchema);
 
 app.post('/datos', (req, res) => {
-  const { sensor, dato } = req.body;
+  const { sensor, dato, mac } = req.body;
   const nuevosDatos = new DatosHistoricos({
     sensor: sensor,
-    dato: dato
+    dato: dato,
+    producto: mac
   });
   nuevosDatos.save()
     .then(() => res.status(200).send('Datos guardados correctamente en device_historic'))
@@ -359,19 +361,21 @@ app.get('/cajas-fuertes/:id', async (req, res) => {
 const deviceStateSchema = new mongoose.Schema({
   sensor: String,
   dato: String,
+  producto: String,
   fecha: { type: Date, default: Date.now }
 });
 
 const DeviceState = mongoose.model('device_state', deviceStateSchema);
 
 app.post('/actualizarEstado', (req, res) => {
-  const { sensor, dato } = req.body;
+  const { sensor, dato, mac } = req.body;
 
   DeviceState.findOneAndUpdate(
     { sensor: sensor },
     {
       sensor: sensor,
       dato: dato,
+      producto: mac,
       fecha: new Date()
     },
     {
