@@ -317,11 +317,11 @@ const datosHistoricosSchema = new mongoose.Schema({
 const DatosHistoricos = mongoose.model('device_historic', datosHistoricosSchema);
 
 app.post('/datos', (req, res) => {
-  const { sensor, dato, mac } = req.body;
+  const { sensor, dato, producto } = req.body;
   const nuevosDatos = new DatosHistoricos({
     sensor: sensor,
     dato: dato,
-    producto: mac
+    producto: producto
   });
   nuevosDatos.save()
     .then(() => res.status(200).send('Datos guardados correctamente en device_historic'))
@@ -368,14 +368,14 @@ const deviceStateSchema = new mongoose.Schema({
 const DeviceState = mongoose.model('device_state', deviceStateSchema);
 
 app.post('/actualizarEstado', (req, res) => {
-  const { sensor, dato, mac } = req.body;
+  const { sensor, dato, producto } = req.body;
 
   DeviceState.findOneAndUpdate(
     { sensor: sensor },
     {
       sensor: sensor,
       dato: dato,
-      producto: mac,
+      producto: producto,
       fecha: new Date()
     },
     {
