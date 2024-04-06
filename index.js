@@ -85,9 +85,9 @@ const mqttClient = mqtt.connect('mqtt://broker.emqx.io', {
 });
 
 app.post('/registro-pin', (req, res) => {
-  const { mac } = req.body;
-  console.log("Mac recibida:", mac);
-  Usuario.findOne({ 'dispositivo.mac': mac })
+  const { producto } = req.body;
+  console.log("producto recibida:", producto);
+  Usuario.findOne({ 'dispositivo.producto': producto })
     .then(usuario => {
       console.log("Usuario encontrado:", usuario);
       if (!usuario || !usuario.dispositivo || !usuario.dispositivo[0].pin) {
