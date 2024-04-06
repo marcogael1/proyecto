@@ -289,7 +289,7 @@ app.post('/login', (req, res) => {
       }
 
       const mac = usuario.dispositivo.length > 0 ? usuario.dispositivo[0].mac : null;
-      const codigo = usuario.dispositivo.length > 0 ? usuario.dispositivo[0].codigo : null;
+      const codigo = usuario.dispositivo.length > 0 ? usuario.dispositivo[0].producto : null;
 
       res.json({
         message: "Usuario encontrado",
