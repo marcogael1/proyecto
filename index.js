@@ -288,15 +288,16 @@ app.post('/login', (req, res) => {
         return res.status(404).json({ message: "Usuario no encontrado o contraseña incorrecta" });
       }
 
-      // Suponiendo que quieres enviar la MAC del primer dispositivo registrado por el usuario
       const mac = usuario.dispositivo.length > 0 ? usuario.dispositivo[0].mac : null;
+      const codigo = usuario.dispositivo.length > 0 ? usuario.dispositivo[0].codigo : null;
 
       res.json({
         message: "Usuario encontrado",
         id: usuario._id,
         tipo: usuario.tipo,
         mac: mac,
-        correo: usuario.correo  // Incluye la MAC en la respuesta
+        codigo: codigo,
+        correo: usuario.correo  
       });
     })
     .catch(error => {
