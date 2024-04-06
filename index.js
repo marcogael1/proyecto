@@ -717,6 +717,36 @@ app.post('/cajas-fuertes', async (req, res) => {
 });
 
 
+app.post('/asignar-pin', async (req, res) => {
+  const { mac, pin } = req.body;
+
+  try {
+    const usuarioExistente = await Usuario.findOne({ 'dispositivo.mac': mac });
+
+    if (usuarioExistente) {
+      if (usuarioExistente.dispositivo && usuarioExistente.dispositivo[0].pin) {
+        return res.status(400).json({ message: "Ya hay un PIN registrado para la MAC proporcionada" });
+      } else {
+        usuarioExistente.dispositivo[0].pin = pin;
+        await usuarioExistente.save();
+        return res.status(200).json({ message: "PIN registrado exitosamente" });
+      }
+    } else {
+      const nuevoUsuario = new Usuario({
+        dispositivo: [{
+          mac: mac,
+          pin: pin
+        }]
+      });
+      await nuevoUsuario.save();
+      return res.status(200).json({ message: "Usuario creado y PIN registrado exitosamente" });
+    }
+  } catch (error) {
+    console.error("Error al registrar el PIN:", error);
+    return res.status(500).json({ message: "Error al registrar el PIN", error });
+  }
+});
+
 
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en http://localhost:${PORT}`);
