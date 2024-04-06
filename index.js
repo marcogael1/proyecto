@@ -570,6 +570,22 @@ app.post('/solicitar-recuperacion', async (req, res) => {
   });
 });
 
+app.post('/verificar-producto', async (req, res) => {
+  const { userid } = req.body;
+
+  try {
+    const usuario = await Usuario.findById(userid);
+    if (!usuario || !usuario.dispositivo || usuario.dispositivo.length === 0) {
+      return res.json({ success: false, message: "No se encontró un producto registrado para este usuario." });
+    }
+    res.json({ success: true, message: "Usuario tiene un producto registrado.", producto: usuario.dispositivo[0] });
+  } catch (error) {
+    console.error('Error al verificar código de producto:', error);
+    res.status(500).json({ success: false, message: "Error interno del servidor." });
+  }
+});
+
+
 app.post('/verificar-codigo', (req, res) => {
   const { correo, codigo } = req.body;
 
