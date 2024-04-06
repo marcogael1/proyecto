@@ -410,6 +410,25 @@ app.post('/send-email', (req, res) => {
   });
 });
 
+app.post('/verificar-producto-pin', async (req, res) => {
+  const { userId } = req.body;
+
+  try {
+    const usuario = await Usuario.findById(userId);
+
+    if (!usuario || !usuario.dispositivo || usuario.dispositivo.length === 0 || !usuario.dispositivo[0].pin) {
+      return res.json({ success: false, message: "No se encontró un PIN registrado para este usuario." });
+    }
+
+    res.json({ success: true, message: "Usuario tiene un PIN registrado.", pin: usuario.dispositivo[0].pin });
+  } catch (error) {
+    console.error('Error al verificar el PIN del producto:', error);
+    res.status(500).json({ success: false, message: "Error interno del servidor." });
+  }
+});
+
+
+
 app.get('/estados-dispositivos', (req, res) => {
   DeviceState.find({})
     .then(estados => res.json(estados))
