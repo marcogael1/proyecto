@@ -136,8 +136,8 @@ app.post('/asignar-producto', async (req, res) => {
 
 
 app.post('/encontrar-mqtt', async (req, res) => {
-  const { mac, pin } = req.body;
-  Usuario.findOne({ 'dispositivo.mac': mac, 'dispositivo.pin': pin })
+  const { producto, pin } = req.body;
+  Usuario.findOne({ 'dispositivo.producto': producto, 'dispositivo.pin': pin })
     .then(usuario => {
       if (!usuario) {
         return res.status(404).json({ message: "Pin no encontrado" });
