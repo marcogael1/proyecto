@@ -113,36 +113,30 @@ app.post('/asignar-producto', async (req, res) => {
 
     const macEncontrada = producto.macs.find(mac => mac.codigo === codigo);
 
-    if (macEncontrada.asignado) {
-      // Si el producto ya está asignado a otro usuario, permitir que el usuario lo actualice
-      const usuario = await Usuario.findById(userId);
-      if (usuario.dispositivo.length > 0) {
-        // Actualizar el primer producto en el arreglo del usuario
-        usuario.dispositivo[0].producto = codigo;
-        usuario.dispositivo[0].mac = macEncontrada.mac;
-        await usuario.save();
-      } else {
-        // Si no hay productos asignados al usuario, agregar uno nuevo
-        usuario.dispositivo.push({ producto: codigo, mac: macEncontrada.mac });
-        await usuario.save();
-      }
-      return res.status(200).json({ success: true, message: "Producto asignado correctamente" });    
+    if (!macEncontrada || macEncontrada.asignado) {
+      // Si el producto no existe o ya está asignado a otro usuario, retornar un error
+      return res.status(400).json({ message: "El producto no está disponible para asignar" });
     }
-    
+
+    // Marcar el producto como asignado en la colección CajaFuerte
     macEncontrada.asignado = true;
     await producto.save();
+
+    // Asignar el producto al usuario
     await Usuario.findByIdAndUpdate(
       userId,
       { $push: { dispositivo: { producto: codigo, mac: macEncontrada.mac } } },
       { new: true }
     );
-    
+
     return res.status(200).json({ success: true, message: "Producto asignado correctamente" });    
+
   } catch (error) {
     console.error('Error al asignar el producto:', error);
     res.status(500).json({ message: "Error al asignar el producto", error });
   }
 });
+
 
 
 
