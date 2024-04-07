@@ -114,9 +114,18 @@ app.post('/asignar-producto', async (req, res) => {
     const macEncontrada = producto.macs.find(mac => mac.codigo === codigo);
 
     if (macEncontrada.asignado) {
-      return res.status(400).json({ message: "El producto ya está asignado a otro usuario" });
+      const usuario = await Usuario.findById(userId);
+      if (usuario.dispositivo.length > 0) {
+        usuario.dispositivo[0].producto = codigo;
+        usuario.dispositivo[0].mac = macEncontrada.mac;
+        return res.status(200).json({ success: true, message: "Producto actualizado. Advertencia: se está reemplazando el producto anterior." });
+      } else {
+        usuario.dispositivo.push({ producto: codigo, mac: macEncontrada.mac });
+      }
+      await usuario.save();
+      
+      return res.status(200).json({ success: true, message: "Producto asignado correctamente" });    
     }
-    
     macEncontrada.asignado = true;
     await producto.save();
     await Usuario.findByIdAndUpdate(
@@ -135,6 +144,9 @@ app.post('/asignar-producto', async (req, res) => {
 
 
 
+
+
+
 app.post('/encontrar-mqtt', async (req, res) => {
   const { producto, pin } = req.body;
   Usuario.findOne({ 'dispositivo.producto': producto, 'dispositivo.pin': pin })
@@ -142,7 +154,6 @@ app.post('/encontrar-mqtt', async (req, res) => {
       if (!usuario) {
         return res.status(404).json({ message: "Pin no encontrado" });
       }
-      // Si el PIN es correcto, publica un mensaje para abrir la caja fuerte
       mqttClient.publish('cajafuerte/comandos', "abrir", { qos: 1 }, error => {
         if (error) {
           console.error('Error publicando mensaje: ', error);
