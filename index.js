@@ -122,12 +122,17 @@ app.post('/asignar-producto', async (req, res) => {
     macEncontrada.asignado = true;
     await producto.save();
 
-    // Asignar el producto al usuario
-    await Usuario.findByIdAndUpdate(
-      userId,
-      { $push: { dispositivo: { producto: codigo, mac: macEncontrada.mac } } },
-      { new: true }
-    );
+    // Verificar si el usuario ya tiene un producto asignado
+    const usuario = await Usuario.findById(userId);
+    if (usuario.dispositivo.length > 0) {
+      // Si el usuario ya tiene un producto asignado, actualizar el primer elemento del arreglo
+      usuario.dispositivo[0].producto = codigo;
+      usuario.dispositivo[0].mac = macEncontrada.mac;
+    } else {
+      // Si el usuario no tiene un producto asignado, agregar uno nuevo al arreglo
+      usuario.dispositivo.push({ producto: codigo, mac: macEncontrada.mac });
+    }
+    await usuario.save();
 
     return res.status(200).json({ success: true, message: "Producto asignado correctamente" });    
 
@@ -136,6 +141,7 @@ app.post('/asignar-producto', async (req, res) => {
     res.status(500).json({ message: "Error al asignar el producto", error });
   }
 });
+
 
 
 
