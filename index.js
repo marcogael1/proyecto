@@ -128,6 +128,7 @@ app.post('/asignar-producto', async (req, res) => {
       // Si el usuario ya tiene un producto asignado, actualizar el primer elemento del arreglo
       usuario.dispositivo[0].producto = codigo;
       usuario.dispositivo[0].mac = macEncontrada.mac;
+      usuario.dispositivo[0].pin = null;
     } else {
       // Si el usuario no tiene un producto asignado, agregar uno nuevo al arreglo
       usuario.dispositivo.push({ producto: codigo, mac: macEncontrada.mac });
