@@ -444,8 +444,8 @@ app.post('/verificar-producto-pin', async (req, res) => {
 });
 
 
-app.post('/estado-sensores', async (req, res) => {
-  const { userId } = req.body;
+app.get('/estado-sensores', async (req, res) => {
+  const { userId } = req.query; 
 
   try {
     const usuario = await Usuario.findById(userId);
@@ -468,6 +468,7 @@ app.post('/estado-sensores', async (req, res) => {
     res.status(500).json({ message: "Error al obtener el estado del dispositivo", error });
   }
 });
+
 
 app.get('/estados-dispositivos', (req, res) => {
   DeviceState.find({})
