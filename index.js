@@ -444,6 +444,30 @@ app.post('/verificar-producto-pin', async (req, res) => {
 });
 
 
+app.post('/estado-sensores', async (req, res) => {
+  const { userId } = req.body;
+
+  try {
+    const usuario = await Usuario.findById(userId);
+    if (!usuario || !usuario.dispositivo || usuario.dispositivo.length === 0) {
+      return res.status(404).json({ message: "Usuario no encontrado o no tiene dispositivos registrados." });
+    }
+
+    const macDispositivo = usuario.dispositivo[0].mac;
+
+    const estadoDispositivo = await DeviceState.find({ producto: macDispositivo });
+
+    if (!estadoDispositivo || estadoDispositivo.length === 0) {
+      return res.status(404).json({ message: "No se encontró información de estado para el dispositivo del usuario." });
+    }
+
+    res.status(200).json(estadoDispositivo);
+
+  } catch (error) {
+    console.error('Error al obtener el estado del dispositivo:', error);
+    res.status(500).json({ message: "Error al obtener el estado del dispositivo", error });
+  }
+});
 
 app.get('/estados-dispositivos', (req, res) => {
   DeviceState.find({})
