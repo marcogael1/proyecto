@@ -146,6 +146,30 @@ app.post('/asignar-producto', async (req, res) => {
 
 
 
+app.post('/verificar-mqtt', async (req, res) => {
+  const { userId, producto, pin } = req.body;
+  try {
+    const usuario = await Usuario.findById(userId);
+    if (!usuario) {
+      return res.status(404).json({ message: "Usuario no encontrado" });
+    }
+    const dispositivo = usuario.dispositivo.find(dev => dev.producto === producto && dev.pin === pin);
+    if (!dispositivo) {
+      return res.status(404).json({ message: "Pin no encontrado" });
+    }
+    const mensajeMQTT = `abrir ${dispositivo.mac}`;
+    mqttClient.publish('cajafuerte/comandos', mensajeMQTT, { qos: 1 }, error => {
+      if (error) {
+        console.error('Error publicando mensaje: ', error);
+        return res.status(500).json({ message: "Error al publicar el mensaje MQTT", error });
+      }
+      return res.json({ message: "Pin encontrado", usuario: { nombre: usuario.nombre, nombre_usuario: usuario.nombre_usuario, mac: dispositivo.mac } });
+    });
+  } catch (error) {
+    console.error("Error al buscar el pin:", error);
+    return res.status(500).json({ message: "Error al buscar el pin", error });
+  }
+});
 
 
 
