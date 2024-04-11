@@ -80,7 +80,7 @@ const faqSchema = new mongoose.Schema({
 
 const FAQ = mongoose.model('FAQ', faqSchema);
 
-const mqttClient = mqtt.connect('mqtt://broker.emqx.io', {
+const mqttClient = mqtt.connect('mqtt://broker.hivemq.com', {
   port: 1883
 });
 
