@@ -172,28 +172,33 @@ app.post('/verificar-mqtt', async (req, res) => {
 });
 
 
-
-
-
-
 app.post('/encontrar-mqtt', async (req, res) => {
-  const { producto, pin } = req.body;
-  Usuario.findOne({ 'dispositivo.producto': producto, 'dispositivo.pin': pin })
-    .then(usuario => {
-      if (!usuario) {
-        return res.status(404).json({ message: "Pin no encontrado" });
+  const { userId, pin } = req.body;
+  try {
+    const usuario = await Usuario.findById(userId);
+    if (!usuario) {
+      return res.status(404).json({ message: "Usuario no encontrado" });
+    }
+    // Extraer la dirección MAC del primer dispositivo del usuario
+    const dispositivo = usuario.dispositivo[0];
+    if (!dispositivo) {
+      return res.status(404).json({ message: "El usuario no tiene dispositivos asociados" });
+    }
+    if (dispositivo.pin !== pin) {
+      return res.status(404).json({ message: "Pin incorrecto" });
+    }
+    const mensajeMQTT = `abrir ${dispositivo.mac}`;
+    mqttClient.publish('cajafuerte/comandos', mensajeMQTT, { qos: 1 }, error => {
+      if (error) {
+        console.error('Error publicando mensaje: ', error);
+        return res.status(500).json({ message: "Error al publicar el mensaje MQTT", error });
       }
-      mqttClient.publish('cajafuerte/comandos', "abrir", { qos: 1 }, error => {
-        if (error) {
-          console.error('Error publicando mensaje: ', error);
-        }
-      });
-      res.json({ message: "Pin encontrado", usuario: { nombre: usuario.nombre, nombre_usuario: usuario.nombre_usuario } });
-    })
-    .catch(error => {
-      console.error("Error al buscar el pin:", error);
-      res.status(500).json({ message: "Error al buscar el pin", error });
+      return res.json({ message: "Pin encontrado", usuario: { nombre: usuario.nombre, nombre_usuario: usuario.nombre_usuario, mac: dispositivo.mac } });
     });
+  } catch (error) {
+    console.error("Error al buscar el pin:", error);
+    return res.status(500).json({ message: "Error al buscar el pin", error });
+  }
 });
 
 app.get('/preguntas-frecuentes', async (req, res) => {
